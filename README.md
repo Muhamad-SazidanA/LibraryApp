@@ -1,0 +1,3 @@
+Website Perpustakaan Digital ini dibuat untuk memudahkan semua orang dalam mengelola dan meminjam buku secara online. Dengan fitur-fitur yang lengkap seperti login, manajemen data members dan buku, peminjaman, pengembalian, sampai perhitungan denda otomatis, semuanya jadi lebih praktis dan cepat.
+
+Tampilan yang simpel dan mudah dipahami bikin pengguna nggak bingung saat mengakses menu-menu yang ada. Selain itu, ada juga grafik yang nunjukin statistik peminjaman tiap bulan, jadi bisa lebih gampang memantau aktivitas perpustakaan.
