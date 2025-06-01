@@ -1,6 +1,4 @@
-// src/router/index.jsx (atau sesuai struktur kamu)
-import { createBrowserRouter } from "react-router-dom";
-import App from "../App";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import Login from "../pages/Login";
 import Template from "../layout/Template";
 import BookPage from "../pages/books/index";
@@ -11,62 +9,51 @@ import DataPinjam from "../pages/activities/DataPinjam.jsx";
 import FinesPage from "../pages/fines/index.jsx";
 import ProtectedRoute from "../middleware/ProtectedRoute";
 
+
 export const router = createBrowserRouter([
     {
         path: "/login",
-        element: <Login />, // tidak dibungkus Template karena login sebelum akses layout utama
+        element: <Login />,
     },
     {
         path: "/",
-        element: <Template />,
+        element: (
+            <ProtectedRoute>
+                <Template />
+            </ProtectedRoute>
+        ),
         children: [
             {
-                path: "/",
-                element: <App />,
-            },
-            {
-                path: "/dashboard",
+                path: "",
                 element: <Dashboard />,
             },
             {
-                path: "/members",
-                element: (
-                    <ProtectedRoute>
-                        <MemberPage />
-                    </ProtectedRoute>
-                ),
+                path: "dashboard",
+                element: <Dashboard />,
             },
             {
-                path: "/mybooks",
-                element: (
-                    <ProtectedRoute>
-                        <BookPage />
-                    </ProtectedRoute>
-                ),
+                path: "members",
+                element: <MemberPage />,
             },
             {
-                path: "/BorrowPage",
-                element: (
-                    <ProtectedRoute>
-                        <BorrowPage />
-                    </ProtectedRoute>
-                ),
+                path: "mybooks",
+                element: <BookPage />,
             },
             {
-                path: "/DataPinjam",
-                element: (
-                    <ProtectedRoute>
-                        <DataPinjam />
-                    </ProtectedRoute>
-                ),
+                path: "BorrowPage",
+                element: <BorrowPage />,
             },
             {
-                path: "/FinesPage",
-                element: (
-                    <ProtectedRoute>
-                        <FinesPage />
-                    </ProtectedRoute>
-                ),
+                path: "DataPinjam",
+                element: <DataPinjam />,
+            },
+            {
+                path: "FinesPage",
+                element: <FinesPage />,
+            },
+            {
+                path: "*",
+                element: <Navigate to="/" replace />,
             },
         ],
     },

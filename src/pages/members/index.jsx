@@ -3,44 +3,6 @@ import axios from "axios";
 import { API_URL } from "../../constant";
 import { Modal, Button, Form, Card, Container, Row, Col, Badge } from "react-bootstrap";
 
-const customStyles = {
-    card: {
-        borderRadius: "12px",
-        border: "none",
-        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-        marginBottom: "24px"
-    },
-    cardHeader: {
-        background: "linear-gradient(to right, #f8f9fa, #ffffff)",
-        borderBottom: "1px solid #eee",
-        padding: "16px 20px"
-    },
-    table: {
-        borderCollapse: "separate",
-        borderSpacing: "0 8px"
-    },
-    tableRow: {
-        background: "#ffffff",
-        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.05)",
-        transition: "all 0.2s ease"
-    },
-    button: {
-        borderRadius: "8px",
-        padding: "8px 16px",
-        fontWeight: "500",
-        transition: "all 0.2s ease"
-    },
-    input: {
-        borderRadius: "8px",
-        border: "1px solid #dee2e6",
-        padding: "10px 12px"
-    },
-    badge: {
-        padding: "8px 12px",
-        borderRadius: "6px"
-    }
-};
-
 export default function MemberPage() {
     const [members, setMembers] = useState([]);
     const [showModal, setShowModal] = useState(false);
@@ -124,7 +86,6 @@ export default function MemberPage() {
                 },
             });
 
-            // Update list tanpa fetch ulang
             if (modalType === "add") {
                 setMembers((prev) => [...prev, response.data]);
             } else {
@@ -166,36 +127,34 @@ export default function MemberPage() {
         return date.toLocaleDateString("id-ID", options);
     };
 
-    // Sort members by the latest fines or activity date
-    const sortedMembers = [...members].sort((a, b) => new Date(b.lastActivityDate || b.createdAt) - new Date(a.lastActivityDate || a.createdAt));
+    const sortedMembers = [...members].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
     return (
         <Container fluid className="py-4">
-            <Card style={customStyles.card}>
-                <Card.Header style={customStyles.cardHeader}>
-                    <h4 className="mb-0">Member Management</h4>
+            <Card className="shadow-lg border-0 rounded-4 mb-4">
+                <Card.Header className="bg-secondary text-light rounded-top-4 text-center">
+                    <h2 className="mb-0">Manajemen Anggota</h2>
                 </Card.Header>
-
                 <div className="d-flex justify-content-start align-items-center p-4">
                     <Button
-                        variant="primary"
+                        variant="secondary"
                         onClick={() => handleShowModal("add")}
-                        style={customStyles.button}
+                        className="rounded-3 fw-semibold"
                     >
                         <i className="bi bi-person-plus me-2"></i>
-                        Add New Member
+                        Add Member
                     </Button>
                 </div>
                 <Card.Body className="p-0">
                     <div className="table-responsive">
-                        <table className="table table-hover mb-0" style={customStyles.table}>
+                        <table className="table table-hover mb-0 align-middle text-center">
                             <thead className="bg-light">
                                 <tr>
-                                    <th>ID Number</th>
-                                    <th>Full Name</th>
-                                    <th>Address</th>
-                                    <th>Date of Birth</th>
-                                    <th>Actions</th>
+                                    <th className="text-center">No KTP</th>
+                                    <th className="text-center">Nama Lengkap</th>
+                                    <th className="text-center">Alamat</th>
+                                    <th className="text-center">Tanggal Lahir</th>
+                                    <th className="text-center">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -203,36 +162,40 @@ export default function MemberPage() {
                                     <tr>
                                         <td colSpan="5" className="text-center py-4">
                                             <i className="bi bi-people h3 d-block text-muted"></i>
-                                            <p className="text-muted mb-0">No members registered yet</p>
+                                            <p className="text-muted mb-0">Belum ada anggota terdaftar</p>
                                         </td>
                                     </tr>
                                 ) : (
                                     sortedMembers.map((member) => (
-                                        <tr key={member.id} style={customStyles.tableRow}>
-                                            <td>
-                                                <Badge bg="info" style={customStyles.badge}>
+                                        <tr key={member.id}>
+                                            <td className="align-middle text-center" style={{ maxWidth: 120, whiteSpace: "pre-line", wordBreak: "break-word" }}>
+                                                <Badge bg="secondary" className="rounded-pill px-3 py-2">
                                                     {member.no_ktp}
                                                 </Badge>
                                             </td>
-                                            <td className="fw-medium">{member.nama}</td>
-                                            <td>{member.alamat}</td>
-                                            <td>{formatTanggalLahir(member.tgl_lahir)}</td>
-                                            <td>
+                                            <td className="align-middle text-center" style={{ maxWidth: 160, whiteSpace: "pre-line", wordBreak: "break-word" }}>
+                                                {member.nama}
+                                            </td>
+                                            <td className="align-middle text-center" style={{ maxWidth: 180, whiteSpace: "pre-line", wordBreak: "break-word" }}>
+                                                {member.alamat}
+                                            </td>
+                                            <td className="align-middle text-center" style={{ maxWidth: 160, whiteSpace: "pre-line", wordBreak: "break-word" }}>
+                                                {formatTanggalLahir(member.tgl_lahir)}
+                                            </td>
+                                            <td className="align-middle text-center">
                                                 <Button
                                                     variant="outline-info"
                                                     size="sm"
-                                                    className="me-2"
-                                                    style={customStyles.button}
+                                                    className="me-2 rounded-3"
                                                     onClick={() => handleShowDetail(member)}
                                                 >
                                                     <i className="bi bi-eye me-1"></i>
-                                                    View
+                                                    Detail
                                                 </Button>
                                                 <Button
                                                     variant="outline-primary"
                                                     size="sm"
-                                                    className="me-2"
-                                                    style={customStyles.button}
+                                                    className="me-2 rounded-3"
                                                     onClick={() => handleShowModal("edit", member)}
                                                 >
                                                     <i className="bi bi-pencil me-1"></i>
@@ -241,11 +204,11 @@ export default function MemberPage() {
                                                 <Button
                                                     variant="outline-danger"
                                                     size="sm"
-                                                    style={customStyles.button}
+                                                    className="rounded-3"
                                                     onClick={() => confirmDelete(member)}
                                                 >
                                                     <i className="bi bi-trash me-1"></i>
-                                                    Remove
+                                                    Hapus
                                                 </Button>
                                             </td>
                                         </tr>
@@ -257,12 +220,12 @@ export default function MemberPage() {
                 </Card.Body>
             </Card>
 
-            {/* Member Form Modal */}
+            {/* Modal Form Anggota */}
             <Modal show={showModal} onHide={handleCloseModal} centered>
-                <Modal.Header closeButton className="border-0" style={customStyles.cardHeader}>
+                <Modal.Header closeButton className="border-0 text-black">
                     <Modal.Title>
                         <i className={`bi bi-${modalType === "add" ? "person-plus" : modalType === "edit" ? "person-gear" : "person-badge"} me-2`}></i>
-                        {modalType === "add" ? "Add New Member" : modalType === "edit" ? "Edit Member Details" : "Member Information"}
+                        {modalType === "add" ? "Add New Member" : modalType === "edit" ? "Edit Data Anggota" : "Detail Anggota"}
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body className="p-4">
@@ -270,25 +233,25 @@ export default function MemberPage() {
                         <Row className="g-3">
                             <Col md={6}>
                                 <div className="p-3 bg-light rounded">
-                                    <small className="text-muted d-block mb-1">ID Number</small>
+                                    <small className="text-muted d-block mb-1">No KTP</small>
                                     <strong>{currentMember.no_ktp}</strong>
                                 </div>
                             </Col>
                             <Col md={6}>
                                 <div className="p-3 bg-light rounded">
-                                    <small className="text-muted d-block mb-1">Full Name</small>
+                                    <small className="text-muted d-block mb-1">Nama Lengkap</small>
                                     <strong>{currentMember.nama}</strong>
                                 </div>
                             </Col>
                             <Col md={12}>
                                 <div className="p-3 bg-light rounded">
-                                    <small className="text-muted d-block mb-1">Address</small>
+                                    <small className="text-muted d-block mb-1">Alamat</small>
                                     <strong>{currentMember.alamat}</strong>
                                 </div>
                             </Col>
                             <Col md={6}>
                                 <div className="p-3 bg-light rounded">
-                                    <small className="text-muted d-block mb-1">Date of Birth</small>
+                                    <small className="text-muted d-block mb-1">Tanggal Lahir</small>
                                     <strong>{formatTanggalLahir(currentMember.tgl_lahir)}</strong>
                                 </div>
                             </Col>
@@ -298,35 +261,35 @@ export default function MemberPage() {
                             <Row className="g-3">
                                 <Col md={12}>
                                     <Form.Group controlId="no_ktp">
-                                        <Form.Label>ID Number</Form.Label>
+                                        <Form.Label>No KTP</Form.Label>
                                         <Form.Control
                                             type="text"
                                             name="no_ktp"
                                             value={currentMember.no_ktp}
                                             onChange={handleChange}
                                             required
-                                            style={customStyles.input}
-                                            placeholder="Enter national ID number"
+                                            className="rounded-3"
+                                            placeholder="Masukkan nomor KTP"
                                         />
                                     </Form.Group>
                                 </Col>
                                 <Col md={12}>
                                     <Form.Group controlId="nama">
-                                        <Form.Label>Full Name</Form.Label>
+                                        <Form.Label>Nama Lengkap</Form.Label>
                                         <Form.Control
                                             type="text"
                                             name="nama"
                                             value={currentMember.nama}
                                             onChange={handleChange}
                                             required
-                                            style={customStyles.input}
-                                            placeholder="Enter member's full name"
+                                            className="rounded-3"
+                                            placeholder="Masukkan nama lengkap anggota"
                                         />
                                     </Form.Group>
                                 </Col>
                                 <Col md={12}>
                                     <Form.Group controlId="alamat">
-                                        <Form.Label>Address</Form.Label>
+                                        <Form.Label>Alamat</Form.Label>
                                         <Form.Control
                                             as="textarea"
                                             rows={2}
@@ -334,21 +297,21 @@ export default function MemberPage() {
                                             value={currentMember.alamat}
                                             onChange={handleChange}
                                             required
-                                            style={customStyles.input}
-                                            placeholder="Enter complete address"
+                                            className="rounded-3"
+                                            placeholder="Masukkan alamat lengkap"
                                         />
                                     </Form.Group>
                                 </Col>
                                 <Col md={12}>
                                     <Form.Group controlId="tgl_lahir">
-                                        <Form.Label>Date of Birth</Form.Label>
+                                        <Form.Label>Tanggal Lahir</Form.Label>
                                         <Form.Control
                                             type="date"
                                             name="tgl_lahir"
                                             value={currentMember.tgl_lahir}
                                             onChange={handleChange}
                                             required
-                                            style={customStyles.input}
+                                            className="rounded-3"
                                         />
                                     </Form.Group>
                                 </Col>
@@ -357,16 +320,16 @@ export default function MemberPage() {
                                 <Button
                                     variant="outline-secondary"
                                     onClick={handleCloseModal}
-                                    style={customStyles.button}
+                                    className="rounded-3"
                                 >
-                                    Cancel
+                                    Batal
                                 </Button>
                                 <Button
                                     variant="primary"
                                     type="submit"
-                                    style={customStyles.button}
+                                    className="rounded-3"
                                 >
-                                    {modalType === "add" ? "Add Member" : "Save Changes"}
+                                    {modalType === "add" ? "Tambah Anggota" : "Simpan Perubahan"}
                                 </Button>
                             </div>
                         </Form>
@@ -374,34 +337,34 @@ export default function MemberPage() {
                 </Modal.Body>
             </Modal>
 
-            {/* Delete Confirmation Modal */}
+            {/* Modal Konfirmasi Hapus */}
             <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
                 <Modal.Header closeButton className="border-0">
                     <Modal.Title>
                         <i className="bi bi-exclamation-triangle text-danger me-2"></i>
-                        Confirm Removal
+                        Konfirmasi Penghapusan
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <p className="mb-0">
-                        Are you sure you want to remove member <strong>{memberToDelete?.nama}</strong>?
-                        This action cannot be undone.
+                        Apakah Anda yakin ingin menghapus anggota <strong>{memberToDelete?.nama}</strong>?<br />
+                        Tindakan ini tidak dapat dibatalkan.
                     </p>
                 </Modal.Body>
                 <Modal.Footer className="border-0">
                     <Button
                         variant="outline-secondary"
                         onClick={() => setShowDeleteModal(false)}
-                        style={customStyles.button}
+                        className="rounded-3"
                     >
-                        Cancel
+                        Batal
                     </Button>
                     <Button
                         variant="danger"
                         onClick={handleDelete}
-                        style={customStyles.button}
+                        className="rounded-3"
                     >
-                        Remove Member
+                        Hapus Anggota
                     </Button>
                 </Modal.Footer>
             </Modal>

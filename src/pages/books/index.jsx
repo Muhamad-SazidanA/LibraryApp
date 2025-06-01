@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { API_URL } from "../../constant";
-import { Modal, Button, Form, Card, Container, Row, Col, Badge } from "react-bootstrap";
+import { Modal, Button, Form, Card, Container, Row, Col, Badge, } from "react-bootstrap";
 
 const customStyles = {
     card: {
@@ -159,76 +159,83 @@ export default function BookPage() {
 
     return (
         <Container fluid className="py-4">
-            <Card style={customStyles.card}>
-                <Card.Header style={customStyles.cardHeader}>
-                    <h4 className="mb-0">Book Management</h4>
+            <Card className="shadow-lg border-0 rounded-4 mb-4">
+                <Card.Header className="bg-secondary text-light rounded-top-4 text-center">
+                    <h2 className="mb-0">Manajemen Buku</h2>
                 </Card.Header>
-
                 <div className="d-flex justify-content-start align-items-center p-4">
                     <Button
-                        variant="primary"
+                        variant="secondary"
                         onClick={() => handleShowModal("add")}
-                        style={customStyles.button}
+                        className="rounded-3 fw-semibold"
                     >
                         <i className="bi bi-plus-circle me-2"></i>
-                        Add New Book
+                        Add Book
                     </Button>
                 </div>
                 <Card.Body className="p-0">
                     <div className="table-responsive">
-                        <table className="table table-hover mb-0" style={customStyles.table}>
+                        <table className="table table-hover mb-0 align-middle text-center">
                             <thead className="bg-light">
                                 <tr>
-                                    <th>Shelf Number</th>
-                                    <th>Title</th>
-                                    <th>Author</th>
-                                    <th>Year</th>
-                                    <th>Publisher</th>
-                                    <th>Stock</th>
-                                    <th>Actions</th>
+                                    <th className="text-center">No Rak</th>
+                                    <th className="text-center">Judul</th>
+                                    <th className="text-center">Pengarang</th>
+                                    <th className="text-center">Tahun Terbit</th>
+                                    <th className="text-center">Penerbit</th>
+                                    <th className="text-center">Stok</th>
+                                    <th className="text-center">Deskripsi</th>
+                                    <th className="text-center">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {sortedBooks.length === 0 ? (
                                     <tr>
-                                        <td colSpan="7" className="text-center py-4">
+                                        <td colSpan="8" className="text-center py-4">
                                             <i className="bi bi-book h3 d-block text-muted"></i>
-                                            <p className="text-muted mb-0">No books available</p>
+                                            <p className="text-muted mb-0">Tidak ada buku tersedia</p>
                                         </td>
                                     </tr>
                                 ) : (
                                     sortedBooks.map((book) => (
-                                        <tr key={book.id} style={customStyles.tableRow}>
-                                            <td>
-                                                <Badge bg="info" style={customStyles.badge}>
+                                        <tr key={book.id}>
+                                            <td className="align-middle text-center" style={{ maxWidth: 120, whiteSpace: "pre-line", wordBreak: "break-word" }}>
+                                                <Badge bg="secondary" className="rounded-pill px-3 py-2">
                                                     {book.no_rak}
                                                 </Badge>
                                             </td>
-                                            <td className="fw-medium">{book.judul}</td>
-                                            <td>{book.pengarang}</td>
-                                            <td>{book.tahun_terbit}</td>
-                                            <td>{book.penerbit}</td>
-                                            <td>
-                                                <Badge bg={book.stok > 0 ? "success" : "danger"} style={customStyles.badge}>
-                                                    {book.stok > 0 ? `${book.stok} Available` : "Out of Stock"}
+                                            <td className="align-middle text-center" style={{ maxWidth: 160, whiteSpace: "pre-line", wordBreak: "break-word" }}>
+                                                {book.judul}
+                                            </td>
+                                            <td className="align-middle text-center" style={{ maxWidth: 140, whiteSpace: "pre-line", wordBreak: "break-word" }}>
+                                                {book.pengarang}
+                                            </td>
+                                            <td className="align-middle text-center">{book.tahun_terbit}</td>
+                                            <td className="align-middle text-center" style={{ maxWidth: 140, whiteSpace: "pre-line", wordBreak: "break-word" }}>
+                                                {book.penerbit}
+                                            </td>
+                                            <td className="align-middle text-center">
+                                                <Badge bg={book.stok > 0 ? "success" : "danger"} className="rounded-pill px-3 py-2">
+                                                    {book.stok > 0 ? `${book.stok} Tersedia` : "Habis"}
                                                 </Badge>
                                             </td>
-                                            <td>
+                                            <td className="align-middle text-center" style={{ maxWidth: 180, whiteSpace: "pre-line", wordBreak: "break-word" }}>
+                                                {book.detail || <span className="text-muted">-</span>}
+                                            </td>
+                                            <td className="align-middle text-center">
                                                 <Button
                                                     variant="outline-info"
                                                     size="sm"
-                                                    className="me-2"
-                                                    style={customStyles.button}
+                                                    className="me-2 rounded-3"
                                                     onClick={() => handleShowDetail(book)}
                                                 >
                                                     <i className="bi bi-eye me-1"></i>
-                                                    View
+                                                    Detail
                                                 </Button>
                                                 <Button
                                                     variant="outline-primary"
                                                     size="sm"
-                                                    className="me-2"
-                                                    style={customStyles.button}
+                                                    className="me-2 rounded-3"
                                                     onClick={() => handleShowModal("edit", book)}
                                                 >
                                                     <i className="bi bi-pencil me-1"></i>
@@ -237,11 +244,11 @@ export default function BookPage() {
                                                 <Button
                                                     variant="outline-danger"
                                                     size="sm"
-                                                    style={customStyles.button}
+                                                    className="rounded-3"
                                                     onClick={() => confirmDelete(book)}
                                                 >
                                                     <i className="bi bi-trash me-1"></i>
-                                                    Remove
+                                                    Hapus
                                                 </Button>
                                             </td>
                                         </tr>
@@ -253,12 +260,16 @@ export default function BookPage() {
                 </Card.Body>
             </Card>
 
-            {/* Add/Edit Modal */}
+            {/* Add/Edit/Detail Modal */}
             <Modal show={showModal} onHide={handleCloseModal} centered>
                 <Modal.Header closeButton className="border-0" style={customStyles.cardHeader}>
                     <Modal.Title>
                         <i className={`bi bi-${modalType === "add" ? "plus-circle" : modalType === "edit" ? "pencil" : "info-circle"} me-2`}></i>
-                        {modalType === "add" ? "Add New Book" : modalType === "edit" ? "Edit Book Details" : "Book Information"}
+                        {modalType === "add"
+                            ? "Add New Book"
+                            : modalType === "edit"
+                                ? "Edit Data Buku"
+                                : "Detail Buku"}
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body className="p-4">
@@ -267,37 +278,37 @@ export default function BookPage() {
                             <Col xs={12}>
                                 <Card className="border-0 shadow-sm">
                                     <Card.Body>
-                                        <h6 className="text-muted mb-3">Book Details</h6>
+                                        <h6 className="text-muted mb-3">Detail Buku</h6>
                                         <Row className="g-3">
                                             <Col md={6}>
-                                                <p className="mb-1"><strong>Shelf Number:</strong></p>
+                                                <p className="mb-1"><strong>No Rak:</strong></p>
                                                 <p>{currentBook.no_rak}</p>
                                             </Col>
                                             <Col md={6}>
-                                                <p className="mb-1"><strong>Title:</strong></p>
+                                                <p className="mb-1"><strong>Judul:</strong></p>
                                                 <p>{currentBook.judul}</p>
                                             </Col>
                                             <Col md={6}>
-                                                <p className="mb-1"><strong>Author:</strong></p>
+                                                <p className="mb-1"><strong>Pengarang:</strong></p>
                                                 <p>{currentBook.pengarang}</p>
                                             </Col>
                                             <Col md={6}>
-                                                <p className="mb-1"><strong>Publication Year:</strong></p>
+                                                <p className="mb-1"><strong>Tahun Terbit:</strong></p>
                                                 <p>{currentBook.tahun_terbit}</p>
                                             </Col>
                                             <Col md={6}>
-                                                <p className="mb-1"><strong>Publisher:</strong></p>
+                                                <p className="mb-1"><strong>Penerbit:</strong></p>
                                                 <p>{currentBook.penerbit}</p>
                                             </Col>
                                             <Col md={6}>
-                                                <p className="mb-1"><strong>Available Stock:</strong></p>
+                                                <p className="mb-1"><strong>Stok Tersedia:</strong></p>
                                                 <Badge bg={parseInt(currentBook.stok) > 0 ? "success" : "danger"} pill>
-                                                    {currentBook.stok} copies
+                                                    {currentBook.stok} {parseInt(currentBook.stok) > 0 ? "Tersedia" : "Habis"}
                                                 </Badge>
                                             </Col>
                                             <Col xs={12}>
-                                                <p className="mb-1"><strong>Additional Information:</strong></p>
-                                                <p className="text-muted">{currentBook.detail || "No additional information available"}</p>
+                                                <p className="mb-1"><strong>Deskripsi:</strong></p>
+                                                <p className="text-muted">{currentBook.detail || "Tidak ada deskripsi"}</p>
                                             </Col>
                                         </Row>
                                     </Card.Body>
@@ -309,7 +320,7 @@ export default function BookPage() {
                             <Row className="g-3">
                                 <Col md={6}>
                                     <Form.Group controlId="no_rak">
-                                        <Form.Label>Shelf Number</Form.Label>
+                                        <Form.Label>No Rak</Form.Label>
                                         <Form.Control
                                             type="text"
                                             name="no_rak"
@@ -317,13 +328,13 @@ export default function BookPage() {
                                             onChange={handleChange}
                                             required
                                             style={customStyles.input}
-                                            placeholder="Enter shelf number"
+                                            placeholder="Masukkan nomor rak"
                                         />
                                     </Form.Group>
                                 </Col>
                                 <Col md={6}>
                                     <Form.Group controlId="judul">
-                                        <Form.Label>Book Title</Form.Label>
+                                        <Form.Label>Judul Buku</Form.Label>
                                         <Form.Control
                                             type="text"
                                             name="judul"
@@ -331,13 +342,13 @@ export default function BookPage() {
                                             onChange={handleChange}
                                             required
                                             style={customStyles.input}
-                                            placeholder="Enter book title"
+                                            placeholder="Masukkan judul buku"
                                         />
                                     </Form.Group>
                                 </Col>
                                 <Col md={6}>
                                     <Form.Group controlId="pengarang">
-                                        <Form.Label>Author</Form.Label>
+                                        <Form.Label>Pengarang</Form.Label>
                                         <Form.Control
                                             type="text"
                                             name="pengarang"
@@ -345,13 +356,13 @@ export default function BookPage() {
                                             onChange={handleChange}
                                             required
                                             style={customStyles.input}
-                                            placeholder="Enter author name"
+                                            placeholder="Masukkan nama pengarang"
                                         />
                                     </Form.Group>
                                 </Col>
                                 <Col md={6}>
                                     <Form.Group controlId="tahun_terbit">
-                                        <Form.Label>Publication Year</Form.Label>
+                                        <Form.Label>Tahun Terbit</Form.Label>
                                         <Form.Control
                                             type="text"
                                             name="tahun_terbit"
@@ -359,13 +370,13 @@ export default function BookPage() {
                                             onChange={handleChange}
                                             required
                                             style={customStyles.input}
-                                            placeholder="Enter publication year"
+                                            placeholder="Masukkan tahun terbit"
                                         />
                                     </Form.Group>
                                 </Col>
                                 <Col md={6}>
                                     <Form.Group controlId="penerbit">
-                                        <Form.Label>Publisher</Form.Label>
+                                        <Form.Label>Penerbit</Form.Label>
                                         <Form.Control
                                             type="text"
                                             name="penerbit"
@@ -373,13 +384,13 @@ export default function BookPage() {
                                             onChange={handleChange}
                                             required
                                             style={customStyles.input}
-                                            placeholder="Enter publisher name"
+                                            placeholder="Masukkan nama penerbit"
                                         />
                                     </Form.Group>
                                 </Col>
                                 <Col md={6}>
                                     <Form.Group controlId="stok">
-                                        <Form.Label>Stock</Form.Label>
+                                        <Form.Label>Stok</Form.Label>
                                         <Form.Control
                                             type="number"
                                             name="stok"
@@ -387,13 +398,13 @@ export default function BookPage() {
                                             onChange={handleChange}
                                             required
                                             style={customStyles.input}
-                                            placeholder="Enter stock quantity"
+                                            placeholder="Masukkan jumlah stok"
                                         />
                                     </Form.Group>
                                 </Col>
                                 <Col xs={12}>
                                     <Form.Group controlId="detail">
-                                        <Form.Label>Additional Information</Form.Label>
+                                        <Form.Label>Deskripsi</Form.Label>
                                         <Form.Control
                                             as="textarea"
                                             rows={3}
@@ -401,17 +412,17 @@ export default function BookPage() {
                                             value={currentBook.detail}
                                             onChange={handleChange}
                                             style={customStyles.input}
-                                            placeholder="Enter additional book details (optional)"
+                                            placeholder="Masukkan deskripsi buku (opsional)"
                                         />
                                     </Form.Group>
                                 </Col>
                             </Row>
                             <div className="d-flex justify-content-end mt-4">
                                 <Button variant="secondary" className="me-2" onClick={handleCloseModal} style={customStyles.button}>
-                                    Cancel
+                                    Batal
                                 </Button>
                                 <Button variant="primary" type="submit" style={customStyles.button}>
-                                    {modalType === "add" ? "Add Book" : "Save Changes"}
+                                    {modalType === "add" ? "Tambah Buku" : "Simpan Perubahan"}
                                 </Button>
                             </div>
                         </Form>

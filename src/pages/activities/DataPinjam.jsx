@@ -211,237 +211,238 @@ export default function DataPinjam() {
     // Sort dendaList by the latest fine date
     const sortedDendaList = [...dendaList].sort((a, b) => new Date(b.createdAt || b.updatedAt) - new Date(a.createdAt || a.updatedAt));
 
-    return (<Container fluid className="py-4">
-        <Card style={customStyles.card}>
-            <Card.Header style={customStyles.cardHeader}>
-                <h4 className="mb-0">
-                    <i className="bi bi-activity me-2"></i>
-                    Member Activity Dashboard
-                </h4>
-            </Card.Header>
-            <Card.Body>
-                <Row xs={1} sm={2} md={2} lg={2} xl={2} className="g-4 justify-content-start">
-                    {members.length === 0 ? (
-                        <Col>
-                            <div className="text-center py-5">
-                                <i className="bi bi-people h1 text-muted"></i>
-                                <p className="mt-3">No members found</p>
-                            </div>
-                        </Col>
-                    ) : (
-                        members.map((member) => {
-                            const { sedangDipinjam, sudahDikembalikan, totalDendaCount } = getMemberStats(member.id);
-                            return (
-                                <Col key={member.id}>
-                                    <Card className="h-100" style={customStyles.card}>
-                                        <Card.Body>
-                                            <div className="d-flex justify-content-between align-items-center mb-3">
-                                                <div>
-                                                    <h5 className="mb-1">{member.nama}</h5>
-                                                    <small className="text-muted">ID: {member.id}</small>
-                                                </div>
-                                                <Badge bg="info" style={customStyles.badge}>
-                                                    Active Member
-                                                </Badge>
-                                            </div>
-
-                                            <Row className="g-2 mb-3">
-                                                <Col xs={4}>
-                                                    <div style={customStyles.statCard}>
-                                                        <div className="small text-muted mb-1">Current</div>
-                                                        <h5 className="mb-0">
-                                                            <Badge bg="warning" text="dark" style={customStyles.badge}>
-                                                                {sedangDipinjam}
-                                                            </Badge>
-                                                        </h5>
-                                                    </div>
-                                                </Col>
-                                                <Col xs={4}>
-                                                    <div style={customStyles.statCard}>
-                                                        <div className="small text-muted mb-1">Returned</div>
-                                                        <h5 className="mb-0">
-                                                            <Badge bg="success" style={customStyles.badge}>
-                                                                {sudahDikembalikan}
-                                                            </Badge>
-                                                        </h5>
-                                                    </div>
-                                                </Col>
-                                                <Col xs={4}>
-                                                    <div style={customStyles.statCard}>
-                                                        <div className="small text-muted mb-1">Fines</div>
-                                                        <h5 className="mb-0">
-                                                            <Badge
-                                                                bg={totalDendaCount > 0 ? "danger" : "secondary"}
-                                                                style={customStyles.badge}
-                                                            >
-                                                                {totalDendaCount}
-                                                            </Badge>
-                                                        </h5>
-                                                    </div>
-                                                </Col>
-                                            </Row>
-
-                                            <Button
-                                                variant="outline-primary"
-                                                onClick={() => openDetailModal(member)}
-                                                className="w-100"
-                                                style={customStyles.button}
-                                            >
-                                                <i className="bi bi-list-ul me-2"></i>
-                                                View Activity History
-                                            </Button>
-                                        </Card.Body>
-                                    </Card>
-                                </Col>
-                            );
-                        })
-                    )}
-                </Row>
-            </Card.Body>
-        </Card>
-
-        <Modal
-            show={showDetailModal}
-            onHide={closeDetailModal}
-            size="lg"
-            centered
-            scrollable
-        >
-            <Modal.Header closeButton className="border-0" style={customStyles.cardHeader}>
-                <Modal.Title>
-                    <i className="bi bi-person-badge me-2"></i>
-                    {selectedMember?.nama}'s Activity History
-                </Modal.Title>
-            </Modal.Header>
-            <Modal.Body className="p-4">
-                {selectedMember ? (
-                    <>
-                        <div className="mb-4">
-                            <h6 className="text-muted mb-3">Member Information</h6>
-                            <Row className="g-3">
-                                <Col md={6}>
-                                    <div className="p-3 bg-light rounded">
-                                        <small className="text-muted d-block">Full Name</small>
-                                        <strong>{selectedMember.nama}</strong>
-                                    </div>
-                                </Col>
-                                <Col md={6}>
-                                    <div className="p-3 bg-light rounded">
-                                        <small className="text-muted d-block">Member ID</small>
-                                        <strong>{selectedMember.id}</strong>
-                                    </div>
-                                </Col>
-                            </Row>
-                        </div>
-
-                        <h6 className="text-muted mb-3">Borrowing History</h6>
-                        <ListGroup variant="flush">
-                            {getPeminjamanByMember(selectedMember.id).length === 0 ? (
-                                <div className="text-center py-4">
-                                    <i className="bi bi-inbox h3 d-block text-muted"></i>
-                                    <p className="text-muted">No borrowing history found</p>
+    return (
+        <Container fluid className="py-4">
+            <Card className="shadow-lg border-0 rounded-4 mb-4">
+                <Card.Header className="bg-secondary text-light rounded-top-4 text-center">
+                    <h2 className="mb-0">
+                        <i className="bi bi-activity me-2"></i>
+                        Member Activity Dashboard
+                    </h2>
+                </Card.Header>
+                <Card.Body>
+                    <Row xs={1} sm={2} md={2} lg={2} xl={2} className="g-4 justify-content-start">
+                        {members.length === 0 ? (
+                            <Col>
+                                <div className="text-center py-5">
+                                    <i className="bi bi-people h1 text-muted"></i>
+                                    <p className="mt-3">No members found</p>
                                 </div>
-                            ) : (
-                                getPeminjamanByMember(selectedMember.id).map((item) => {
-                                    const statusText = item.status_pengembalian
-                                        ? "Returned"
-                                        : moment().isAfter(moment(item.tgl_pengembalian))
-                                            ? "Overdue"
-                                            : "Borrowed";
-                                    const statusVariant = item.status_pengembalikan
-                                        ? "success"
-                                        : moment().isAfter(moment(item.tgl_pengembalian))
-                                            ? "danger"
-                                            : "warning";
-
-                                    const dendaPinjam = getDendaForPinjam(item);
-
-                                    return (
-                                        <ListGroup.Item key={item.id} style={customStyles.listItem}>
-                                            <Row className="align-items-center">
-                                                <Col>
-                                                    <div className="mb-2">
-                                                        <Badge bg={statusVariant} style={customStyles.badge}>
-                                                            {statusText}
-                                                        </Badge>
+                            </Col>
+                        ) : (
+                            members.map((member) => {
+                                const { sedangDipinjam, sudahDikembalikan, totalDendaCount } = getMemberStats(member.id);
+                                return (
+                                    <Col key={member.id}>
+                                        <Card className="h-100" style={customStyles.card}>
+                                            <Card.Body>
+                                                <div className="d-flex justify-content-between align-items-center mb-3">
+                                                    <div>
+                                                        <h5 className="mb-1">{member.nama}</h5>
+                                                        <small className="text-muted">ID: {member.id}</small>
                                                     </div>
-                                                    <p className="mb-1">
-                                                        <strong>Book ID:</strong> {item.id_buku}
-                                                    </p>
-                                                    <p className="mb-1">
-                                                        <small className="text-muted">
-                                                            Borrowed: {moment(item.tgl_pinjam).format("MMM DD, YYYY")}
-                                                        </small>
-                                                    </p>
-                                                    <p className="mb-0">
-                                                        <small className="text-muted">
-                                                            Due: {moment(item.tgl_pengembalian).format("MMM DD, YYYY")}
-                                                        </small>
-                                                    </p>
-                                                </Col>
-                                            </Row>
-
-                                            {dendaPinjam.length > 0 && (
-                                                <div className="mt-3 pt-3 border-top">
-                                                    <h6 className="text-muted mb-2">Fine History</h6>
-                                                    <ListGroup variant="flush">
-                                                        {dendaPinjam.map((denda, i) => (
-                                                            <ListGroup.Item
-                                                                key={i}
-                                                                className="px-0 py-2 border-0"
-                                                            >
-                                                                <div className="d-flex justify-content-between align-items-center">
-                                                                    <div>
-                                                                        <Badge
-                                                                            bg="danger"
-                                                                            style={customStyles.badge}
-                                                                            className="me-2"
-                                                                        >
-                                                                            {denda.jenis_denda.toUpperCase()}
-                                                                        </Badge>
-                                                                        <span className="text-muted">
-                                                                            {denda.deskripsi}
-                                                                        </span>
-                                                                    </div>
-                                                                    <strong>
-                                                                        Rp {Number(denda.jumlah_denda).toLocaleString("id-ID")}
-                                                                    </strong>
-                                                                </div>
-                                                            </ListGroup.Item>
-                                                        ))}
-                                                    </ListGroup>
+                                                    <Badge bg="info" style={customStyles.badge}>
+                                                        Active Member
+                                                    </Badge>
                                                 </div>
-                                            )}
-                                        </ListGroup.Item>
-                                    );
-                                })
-                            )}
-                        </ListGroup>
-                    </>
-                ) : (
-                    <div className="text-center py-4">
-                        <Spinner animation="border" variant="primary" />
-                        <p className="mt-2 mb-0">Loading activity details...</p>
-                    </div>
-                )}
-            </Modal.Body>
-            <Modal.Footer className="border-0">
-                <Button
-                    variant="secondary"
-                    onClick={closeDetailModal}
-                    style={customStyles.button}
-                >
-                    Close
-                </Button>
-                <Button
-                    variant="primary"
-                    onClick={exportToPDF}
-                    style={customStyles.button}
-                >
-                    Export To PDF
-                </Button>
-            </Modal.Footer>
-        </Modal>
-    </Container>
+
+                                                <Row className="g-2 mb-3">
+                                                    <Col xs={4}>
+                                                        <div style={customStyles.statCard}>
+                                                            <div className="small text-muted mb-1">Current</div>
+                                                            <h5 className="mb-0">
+                                                                <Badge bg="warning" text="dark" style={customStyles.badge}>
+                                                                    {sedangDipinjam}
+                                                                </Badge>
+                                                            </h5>
+                                                        </div>
+                                                    </Col>
+                                                    <Col xs={4}>
+                                                        <div style={customStyles.statCard}>
+                                                            <div className="small text-muted mb-1">Returned</div>
+                                                            <h5 className="mb-0">
+                                                                <Badge bg="success" style={customStyles.badge}>
+                                                                    {sudahDikembalikan}
+                                                                </Badge>
+                                                            </h5>
+                                                        </div>
+                                                    </Col>
+                                                    <Col xs={4}>
+                                                        <div style={customStyles.statCard}>
+                                                            <div className="small text-muted mb-1">Fines</div>
+                                                            <h5 className="mb-0">
+                                                                <Badge
+                                                                    bg={totalDendaCount > 0 ? "danger" : "secondary"}
+                                                                    style={customStyles.badge}
+                                                                >
+                                                                    {totalDendaCount}
+                                                                </Badge>
+                                                            </h5>
+                                                        </div>
+                                                    </Col>
+                                                </Row>
+
+                                                <Button
+                                                    variant="outline-secondary"
+                                                    onClick={() => openDetailModal(member)}
+                                                    className="w-100"
+                                                    style={customStyles.button}
+                                                >
+                                                    <i className="bi bi-list-ul me-2"></i>
+                                                    View Activity History
+                                                </Button>
+                                            </Card.Body>
+                                        </Card>
+                                    </Col>
+                                );
+                            })
+                        )}
+                    </Row>
+                </Card.Body>
+            </Card>
+
+            <Modal
+                show={showDetailModal}
+                onHide={closeDetailModal}
+                size="lg"
+                centered
+                scrollable
+            >
+                <Modal.Header closeButton className="border-0" style={customStyles.cardHeader}>
+                    <Modal.Title>
+                        <i className="bi bi-person-badge me-2"></i>
+                        {selectedMember?.nama}'s Activity History
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body className="p-4">
+                    {selectedMember ? (
+                        <>
+                            <div className="mb-4">
+                                <h6 className="text-muted mb-3">Member Information</h6>
+                                <Row className="g-3">
+                                    <Col md={6}>
+                                        <div className="p-3 bg-light rounded">
+                                            <small className="text-muted d-block">Full Name</small>
+                                            <strong>{selectedMember.nama}</strong>
+                                        </div>
+                                    </Col>
+                                    <Col md={6}>
+                                        <div className="p-3 bg-light rounded">
+                                            <small className="text-muted d-block">Member ID</small>
+                                            <strong>{selectedMember.id}</strong>
+                                        </div>
+                                    </Col>
+                                </Row>
+                            </div>
+
+                            <h6 className="text-muted mb-3">Borrowing History</h6>
+                            <ListGroup variant="flush">
+                                {getPeminjamanByMember(selectedMember.id).length === 0 ? (
+                                    <div className="text-center py-4">
+                                        <i className="bi bi-inbox h3 d-block text-muted"></i>
+                                        <p className="text-muted">No borrowing history found</p>
+                                    </div>
+                                ) : (
+                                    getPeminjamanByMember(selectedMember.id).map((item) => {
+                                        const statusText = item.status_pengembalian
+                                            ? "Returned"
+                                            : moment().isAfter(moment(item.tgl_pengembalian))
+                                                ? "Overdue"
+                                                : "Borrowed";
+                                        const statusVariant = item.status_pengembalikan
+                                            ? "success"
+                                            : moment().isAfter(moment(item.tgl_pengembalian))
+                                                ? "danger"
+                                                : "warning";
+
+                                        const dendaPinjam = getDendaForPinjam(item);
+
+                                        return (
+                                            <ListGroup.Item key={item.id} style={customStyles.listItem}>
+                                                <Row className="align-items-center">
+                                                    <Col>
+                                                        <div className="mb-2">
+                                                            <Badge bg={statusVariant} style={customStyles.badge}>
+                                                                {statusText}
+                                                            </Badge>
+                                                        </div>
+                                                        <p className="mb-1">
+                                                            <strong>Book ID:</strong> {item.id_buku}
+                                                        </p>
+                                                        <p className="mb-1">
+                                                            <small className="text-muted">
+                                                                Borrowed: {moment(item.tgl_pinjam).format("MMM DD, YYYY")}
+                                                            </small>
+                                                        </p>
+                                                        <p className="mb-0">
+                                                            <small className="text-muted">
+                                                                Due: {moment(item.tgl_pengembalian).format("MMM DD, YYYY")}
+                                                            </small>
+                                                        </p>
+                                                    </Col>
+                                                </Row>
+
+                                                {dendaPinjam.length > 0 && (
+                                                    <div className="mt-3 pt-3 border-top">
+                                                        <h6 className="text-muted mb-2">Fine History</h6>
+                                                        <ListGroup variant="flush">
+                                                            {dendaPinjam.map((denda, i) => (
+                                                                <ListGroup.Item
+                                                                    key={i}
+                                                                    className="px-0 py-2 border-0"
+                                                                >
+                                                                    <div className="d-flex justify-content-between align-items-center">
+                                                                        <div>
+                                                                            <Badge
+                                                                                bg="danger"
+                                                                                style={customStyles.badge}
+                                                                                className="me-2"
+                                                                            >
+                                                                                {denda.jenis_denda.toUpperCase()}
+                                                                            </Badge>
+                                                                            <span className="text-muted">
+                                                                                {denda.deskripsi}
+                                                                            </span>
+                                                                        </div>
+                                                                        <strong>
+                                                                            Rp {Number(denda.jumlah_denda).toLocaleString("id-ID")}
+                                                                        </strong>
+                                                                    </div>
+                                                                </ListGroup.Item>
+                                                            ))}
+                                                        </ListGroup>
+                                                    </div>
+                                                )}
+                                            </ListGroup.Item>
+                                        );
+                                    })
+                                )}
+                            </ListGroup>
+                        </>
+                    ) : (
+                        <div className="text-center py-4">
+                            <Spinner animation="border" variant="primary" />
+                            <p className="mt-2 mb-0">Loading activity details...</p>
+                        </div>
+                    )}
+                </Modal.Body>
+                <Modal.Footer className="border-0">
+                    <Button
+                        variant="secondary"
+                        onClick={closeDetailModal}
+                        style={customStyles.button}
+                    >
+                        Close
+                    </Button>
+                    <Button
+                        variant="primary"
+                        onClick={exportToPDF}
+                        style={customStyles.button}
+                    >
+                        Export To PDF
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        </Container>
     );
 }

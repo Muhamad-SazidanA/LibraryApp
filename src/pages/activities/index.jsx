@@ -178,10 +178,9 @@ export default function ActivitiesPage() {
 
     return (
         <Container className="mt-4">
-            <Card className="shadow-sm mb-4">
-                <Card.Header as="h5" className="bg-white">
-                    <i className="bi bi-journal-plus me-2"></i>
-                    Form Peminjaman Buku
+            <Card className="shadow-lg border-0 rounded-4 mb-4">
+                <Card.Header className="bg-secondary text-light rounded-top-4 text-center">
+                    <h2 className="mb-0">Book Lending</h2>
                 </Card.Header>
                 <Card.Body>
                     <Form onSubmit={handleSubmit}>
@@ -200,7 +199,7 @@ export default function ActivitiesPage() {
                                         required
                                         className="shadow-sm"
                                     >
-                                        <option value="">-- Pilih Member --</option>
+                                        <option value="">Pilih Member</option>
                                         {members.map((m) => (
                                             <option key={m.id} value={m.id}>{m.nama}</option>
                                         ))}
@@ -244,7 +243,7 @@ export default function ActivitiesPage() {
                                         required
                                         className="shadow-sm"
                                     >
-                                        <option value="">-- Pilih Buku --</option>
+                                        <option value="">Pilih Buku</option>
                                         {books.map((b) => (
                                             <option key={b.id} value={b.id}>{b.judul}</option>
                                         ))}
@@ -276,7 +275,7 @@ export default function ActivitiesPage() {
                         </Row>
 
                         <div className="d-flex justify-content-center">
-                            <Button type="submit" variant="primary">
+                            <Button type="submit" variant="secondary">
                                 <i className="bi bi-send me-1"></i>
                                 Ajukan Peminjaman
                             </Button>
@@ -284,23 +283,13 @@ export default function ActivitiesPage() {
                     </Form>
                 </Card.Body>
             </Card>
-
-            <Card className="shadow-sm">
-                <div className="d-flex justify-content-start align-items-center p-3">
-                    <Button
-                        variant="outline-success"
-                        className="mb-3"
-                        onClick={exportToExcel}>
-                        <i className="bi bi-file-earmark-excel me-1"></i>
-                        Export to Excel
-                    </Button>
-                </div>
+            <Card className="shadow-lg border-0 rounded-4 mb-4">
                 <Card.Header className="bg-white">
                     <ul className="nav nav-tabs card-header-tabs">
                         <li className="nav-item">
                             <Button
-                                variant={activeView === "belumDikembalikan" ? "primary" : "light"}
-                                className={`nav-link ${activeView === "belumDikembalikan" ? "active" : ""}`}
+                                variant={activeView === "belumDikembalikan" ? "secondary" : "light"}
+                                className={`nav-link text-black ${activeView === "belumDikembalikan" ? "active" : ""}`}
                                 onClick={() => setActiveView("belumDikembalikan")}
                             >
                                 <i className="bi bi-clock-history me-1"></i>
@@ -309,8 +298,8 @@ export default function ActivitiesPage() {
                         </li>
                         <li className="nav-item">
                             <Button
-                                variant={activeView === "sudahDikembalikan" ? "primary" : "light"}
-                                className={`nav-link ${activeView === "sudahDikembalikan" ? "active" : ""}`}
+                                variant={activeView === "sudahDikembalikan" ? "secondary" : "light"}
+                                className={`nav-link text-black ${activeView === "sudahDikembalikan" ? "active" : ""}`}
                                 onClick={() => setActiveView("sudahDikembalikan")}
                             >
                                 <i className="bi bi-check-circle me-1"></i>
@@ -321,15 +310,15 @@ export default function ActivitiesPage() {
                 </Card.Header>
                 <Card.Body className="p-0">
                     <div className="table-responsive">
-                        <table className="table table-hover mb-0">
+                        <table className="table table-hover mb-0 align-middle text-center">
                             <thead className="bg-light">
                                 <tr>
-                                    <th>Member</th>
-                                    <th>Buku</th>
-                                    <th>Tanggal Pinjam</th>
-                                    <th>Tanggal Kembali</th>
-                                    <th>Status</th>
-                                    <th>Aksi</th>
+                                    <th className="text-center">Member</th>
+                                    <th className="text-center">Buku</th>
+                                    <th className="text-center">Tanggal Pinjam</th>
+                                    <th className="text-center">Tanggal Kembali</th>
+                                    <th className="text-center">Status</th>
+                                    <th className="text-center">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -353,29 +342,29 @@ export default function ActivitiesPage() {
 
                                             return (
                                                 <tr key={item.id}>
-                                                    <td>
+                                                    <td className="align-middle text-center" style={{ maxWidth: 160, whiteSpace: "pre-line", wordBreak: "break-word" }}>
                                                         <div className="fw-bold">{member}</div>
                                                         <small className="text-muted">ID: {item.id_member}</small>
                                                     </td>
-                                                    <td>
+                                                    <td className="align-middle text-center" style={{ maxWidth: 160, whiteSpace: "pre-line", wordBreak: "break-word" }}>
                                                         <div>{book}</div>
                                                         <small className="text-muted">
                                                             {books.find((b) => b.id === item.id_buku)?.pengarang}
                                                         </small>
                                                     </td>
-                                                    <td>
+                                                    <td className="align-middle text-center">
                                                         <div>{moment(item.tgl_pinjam).format("DD MMM YYYY")}</div>
                                                         <small className="text-muted">
                                                             {moment(item.tgl_pinjam).fromNow()}
                                                         </small>
                                                     </td>
-                                                    <td>
+                                                    <td className="align-middle text-center">
                                                         <div>{moment(item.tgl_pengembalian).format("DD MMM YYYY")}</div>
                                                         <small className="text-muted">
                                                             {moment(item.tgl_pengembalian).fromNow()}
                                                         </small>
                                                     </td>
-                                                    <td>
+                                                    <td className="align-middle text-center">
                                                         {item.status_pengembalian ? (
                                                             <Badge bg="success" pill>Sudah Dikembalikan</Badge>
                                                         ) : isLate ? (
@@ -384,7 +373,7 @@ export default function ActivitiesPage() {
                                                             <Badge bg="primary" pill>Sedang Dipinjam</Badge>
                                                         )}
                                                     </td>
-                                                    <td>
+                                                    <td className="align-middle text-center">
                                                         {!item.status_pengembalian && (
                                                             <Button
                                                                 variant="outline-success"

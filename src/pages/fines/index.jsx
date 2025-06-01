@@ -88,6 +88,19 @@ export default function FinesPage() {
             setBooks(bk.data?.data || bk.data || []);
             setMembers(mb.data?.data || mb.data || []);
             setDenda(dn.data?.data || []);
+            const dendaData = Array.isArray(dn.data) ? dn.data : (dn.data?.data || []);
+            setFines(dendaData);
+
+            const perMonthDenda = {};
+            dendaData.forEach((item) => {
+                // Fallback: gunakan tanggal hari ini jika tidak ada field tanggal
+                const dateStr = item.createdAt || item.updatedAt || item.tanggal_denda || new Date().toISOString();
+                const date = new Date(dateStr);
+                const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+                perMonthDenda[key] = (perMonthDenda[key] || 0) + 1;
+            });
+            console.log("Denda per bulan:", perMonthDenda);
+
         } catch (err) {
             Swal.fire("Error", "Gagal memuat data", "error");
         }
@@ -177,8 +190,8 @@ export default function FinesPage() {
     }
 
     const filteredFines = fines.filter(fine => {
-        const memberName = fine.member.name.toLowerCase();
-        const memberId = fine.member.id.toLowerCase();
+        const memberName = fine.member?.nama?.toLowerCase() || "";
+        const memberId = (fine.member?.id || "").toString().toLowerCase();
         const searchTerm = search.toLowerCase();
         return (
             memberName.includes(searchTerm) ||
@@ -192,11 +205,18 @@ export default function FinesPage() {
     // Sort fines data by date to show the latest fines at the top
     const sortedFines = [...fines].sort((a, b) => new Date(b.due_date) - new Date(a.due_date));
 
+    // Cari peminjaman yang terlambat tapi belum dikembalikan dan belum ada data denda
+    const lateUnreturned = peminjaman.filter(p =>
+        !p.status_pengembalian &&
+        moment().isAfter(moment(p.tgl_pengembalian)) &&
+        !denda.some(d => d.id_member === p.id_member && d.id_buku === p.id_buku && d.jenis_denda === "terlambat")
+    );
+
     return (
         <Container fluid className="py-4">
-            <Card className="mb-4 shadow-sm" style={customStyles.card}>
-                <Card.Header style={customStyles.cardHeader}>
-                    <h4 className="mb-0">Form Denda Peminjaman</h4>
+            <Card className="shadow-lg border-0 rounded-4 mb-4">
+                <Card.Header className="fw-bold bg-secondary text-light rounded-top-4 text-center">
+                    <h2 className="mb-0">Fines Management</h2>
                 </Card.Header>
                 <Card.Body>
                     <Form onSubmit={handleSubmit}>
@@ -215,7 +235,7 @@ export default function FinesPage() {
                                         required
                                         className="shadow-sm"
                                     >
-                                        <option value="">-- Pilih Member --</option>
+                                        <option value="">Pilih Member</option>
                                         {members.length === 0 && (
                                             <option disabled>Tidak ada data member tersedia</option>
                                         )}
@@ -242,7 +262,7 @@ export default function FinesPage() {
                                         required
                                         className="shadow-sm"
                                     >
-                                        <option value="">-- Pilih Buku --</option>
+                                        <option value="">Pilih Buku</option>
                                         {books.length === 0 && (
                                             <option disabled>Tidak ada data buku tersedia</option>
                                         )}
@@ -292,7 +312,7 @@ export default function FinesPage() {
                                         required
                                         className="shadow-sm"
                                     >
-                                        <option value="">-- Pilih Jenis --</option>
+                                        <option value="">Pilih Jenis</option>
                                         <option value="terlambat">Keterlambatan</option>
                                         <option value="kerusakan">Kerusakan Buku</option>
                                         <option value="kehilangan">Kehilangan Buku</option>
@@ -321,7 +341,7 @@ export default function FinesPage() {
 
                         <div className="d-flex justify-content-center gap-2 mt-5">
                             <Button
-                                variant="outline-primary"
+                                variant="outline-secondary"
                                 type="button"
                                 onClick={addExtraFine}
                                 disabled={!form.jenis_denda || !form.jumlah_denda}
@@ -330,7 +350,7 @@ export default function FinesPage() {
                                 <i className="bi bi-plus-circle me-1"></i>
                                 Tambah Denda Lain
                             </Button>
-                            <Button type="submit" variant="primary" style={customStyles.button}>
+                            <Button type="submit" variant="secondary" style={customStyles.button}>
                                 <i className="bi bi-save me-1"></i>
                                 Simpan Denda
                             </Button>
@@ -367,24 +387,20 @@ export default function FinesPage() {
                     </Form>
                 </Card.Body>
             </Card>
-
-            <Card className="shadow-sm">
-                <Card.Header as="h5" className="bg-white d-flex justify-content-between align-items-center">
-                    <div>
-                        <i className="bi bi-list-check me-2"></i>
-                        Daftar Peminjaman & Denda
-                    </div>
+            <Card className="shadow-lg border-0 rounded-4 mb-4">
+                <Card.Header className="bg-white text-center">
+                    <h3 className="p-2">Daftar Peminjaman & Denda</h3>
                 </Card.Header>
                 <Card.Body className="p-0">
                     <div className="table-responsive">
-                        <table className="table table-hover mb-0" style={customStyles.table}>
+                        <table className="table table-hover mb-0 align-middle text-center">
                             <thead className="bg-light">
                                 <tr>
-                                    <th>Member</th>
-                                    <th>Buku</th>
-                                    <th>Total Denda</th>
-                                    <th>Status</th>
-                                    <th>Aksi</th>
+                                    <th className="text-center">Member</th>
+                                    <th className="text-center">Buku</th>
+                                    <th className="text-center">Total Denda</th>
+                                    <th className="text-center">Deskripsi</th>
+                                    <th className="text-center">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -403,11 +419,24 @@ export default function FinesPage() {
                                         );
                                         return (
                                             <tr key={item.id}>
-                                                <td>{getMemberName(item.id_member)}</td>
-                                                <td>{getBookTitle(item.id_buku)}</td>
-                                                <td>Rp {totalDenda.toLocaleString('id-ID')}</td>
-                                                <td>{item.status}</td>
-                                                <td>
+                                                <td className="align-middle">{getMemberName(item.id_member)}</td>
+                                                <td className="align-middle">{getBookTitle(item.id_buku)}</td>
+                                                <td className="align-middle">Rp {totalDenda.toLocaleString('id-ID')}</td>
+                                                <td className="align-middle" style={{ maxWidth: 200, whiteSpace: "pre-line", wordBreak: "break-word" }}>
+                                                    {list.length > 0
+                                                        ? (
+                                                            <span style={{
+                                                                display: "inline-block",
+                                                                textAlign: "left",
+                                                                whiteSpace: "pre-line",
+                                                                wordBreak: "break-word"
+                                                            }}>
+                                                                {list[0].deskripsi}
+                                                            </span>
+                                                        )
+                                                        : "-"}
+                                                </td>
+                                                <td className="align-middle">
                                                     <Button
                                                         variant="outline-primary"
                                                         size="sm"
@@ -423,6 +452,24 @@ export default function FinesPage() {
                                         );
                                     })
                                 )}
+                                {/* Tampilkan potensi denda keterlambatan */}
+                                {lateUnreturned.map(item => (
+                                    <tr key={`late-${item.id}`} className="table-warning">
+                                        <td className="align-middle">{getMemberName(item.id_member)}</td>
+                                        <td className="align-middle">{getBookTitle(item.id_buku)}</td>
+                                        <td className="align-middle">
+                                            <Badge bg="warning">
+                                                Potensi Denda: Rp {(moment().diff(moment(item.tgl_pengembalian), "days") * 1500).toLocaleString("id-ID")}
+                                            </Badge>
+                                        </td>
+                                        <td className="align-middle">
+                                            <Badge bg="danger">Terlambat</Badge>
+                                        </td>
+                                        <td className="align-middle">
+                                            <span className="text-danger small">Belum dikembalikan</span>
+                                        </td>
+                                    </tr>
+                                ))}
                             </tbody>
                         </table>
                     </div>
@@ -493,30 +540,40 @@ export default function FinesPage() {
                                     <Card.Body className="p-0">
                                         <ListGroup variant="flush">
                                             {getDendaList(selected.id_member, selected.id_buku).length > 0 ? (
-                                                getDendaList(selected.id_member, selected.id_buku).map((d, i) => (
-                                                    <ListGroup.Item key={i} className="py-3">
-                                                        <div className="d-flex justify-content-between align-items-center">
-                                                            <div>
-                                                                <Badge
-                                                                    bg={d.jenis_denda === 'terlambat' ? 'warning' :
-                                                                        d.jenis_denda === 'kerusakan' ? 'danger' :
-                                                                            'secondary'}
-                                                                    className="me-2"
-                                                                >
-                                                                    {d.jenis_denda.toUpperCase()}
-                                                                </Badge>
-                                                                <span className="text-muted">
-                                                                    {d.deskripsi}
-                                                                </span>
+                                                getDendaList(selected.id_member, selected.id_buku).map((d, i) => {
+                                                    const dateStr = d.createdAt || d.updatedAt || d.tanggal_denda;
+                                                    return (
+                                                        <ListGroup.Item key={i} className="py-3">
+                                                            <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+                                                                <div>
+                                                                    <Badge
+                                                                        bg={
+                                                                            d.jenis_denda === 'terlambat'
+                                                                                ? 'warning'
+                                                                                : d.jenis_denda === 'kerusakan'
+                                                                                    ? 'danger'
+                                                                                    : d.jenis_denda === 'kehilangan'
+                                                                                        ? 'dark'
+                                                                                        : 'secondary'
+                                                                        }
+                                                                        className="me-2"
+                                                                    >
+                                                                        {d.jenis_denda.toUpperCase()}
+                                                                    </Badge>
+                                                                    <span className="text-muted">{d.deskripsi}</span>
+                                                                    <div className="small text-muted mt-1">
+                                                                        {dateStr ? moment(dateStr).format("DD MMM YYYY HH:mm") : ""}
+                                                                    </div>
+                                                                </div>
+                                                                <h5 className="mb-0 mt-2 mt-md-0">
+                                                                    <Badge bg="danger" pill>
+                                                                        Rp {Number(d.jumlah_denda).toLocaleString('id-ID')}
+                                                                    </Badge>
+                                                                </h5>
                                                             </div>
-                                                            <h5 className="mb-0">
-                                                                <Badge bg="danger" pill>
-                                                                    Rp {Number(d.jumlah_denda).toLocaleString('id-ID')}
-                                                                </Badge>
-                                                            </h5>
-                                                        </div>
-                                                    </ListGroup.Item>
-                                                ))
+                                                        </ListGroup.Item>
+                                                    );
+                                                })
                                             ) : (
                                                 <ListGroup.Item className="text-center py-4">
                                                     <i className="bi bi-emoji-smile h4 d-block"></i>
